@@ -67,7 +67,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.CustomViewHold
             ex.printStackTrace();
         }
     }
-
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView tv_time;
