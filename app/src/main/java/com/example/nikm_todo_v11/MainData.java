@@ -1,6 +1,8 @@
 package com.example.nikm_todo_v11;
 
-public class MainData {
+import java.io.Serializable;
+
+public class MainData implements Serializable {
 
     private String tv_time;
     private String tv_do;

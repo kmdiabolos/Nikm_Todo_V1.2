@@ -1,10 +1,12 @@
 package com.example.nikm_todo_v11.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -14,9 +16,13 @@ import com.example.nikm_todo_v11.Fragment.DayDoFragment;
 import com.example.nikm_todo_v11.Fragment.EveryDoFragment;
 import com.example.nikm_todo_v11.Fragment.FinishDoFragment;
 import com.example.nikm_todo_v11.Fragment.MonthDoFragment;
+import com.example.nikm_todo_v11.MainData;
 import com.example.nikm_todo_v11.R;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener , Serializable {
 
     DayDoFragment dayDo;
     EveryDoFragment everyDo;
@@ -26,12 +32,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 Button btn_add,btn_nav_open,btn_nav_d,btn_nav_m,btn_nav_e,btn_nav_f;
 DrawerLayout drawerLayout;
 View drawerView;
+String nowPage = "day";
+
+    ArrayList<MainData> dayList = new ArrayList<MainData>();
+    ArrayList<MainData> monthList= new ArrayList<MainData>();
+    ArrayList<MainData> everyList= new ArrayList<MainData>();
+    ArrayList<MainData> finishList= new ArrayList<MainData>();
+    MainData mainData;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==101){
+            mainData = (MainData)data.getSerializableExtra("data");
+            if(nowPage=="day"){
+                dayList.add(mainData);
+                changedFragments("day",dayList);
+            }
+            else if(nowPage=="every"){
+                everyList.add(mainData);
+                changedFragments("every",everyList);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        changedFragments("day");
+        changedFragments("day",dayList);
         btn_add=findViewById(R.id.btn_add);
         btn_nav_open=findViewById(R.id.btn_nav_open);
         btn_nav_d=findViewById(R.id.btn_nav_d);
@@ -57,7 +86,13 @@ View drawerView;
 
     switch(v.getId()){
         case R.id.btn_add :
-
+            switch (nowPage) {
+                case "day": case "every":
+                startActivityForResult(new Intent(this, DoActivity.class), 101);
+                    break;
+                case "month":
+                    break;
+            }
             break;
 
         case R.id.btn_nav_open :
@@ -65,29 +100,33 @@ View drawerView;
             break;
 
         case R.id.btn_nav_d :
-            changedFragments("day");
+            changedFragments("day",dayList);
+            nowPage = "day";
             drawerLayout.closeDrawer(drawerView);
             break;
 
         case R.id.btn_nav_e :
-            changedFragments("every");
+            changedFragments("every",everyList);
+            nowPage = "every";
             drawerLayout.closeDrawer(drawerView);
         break;
 
         case R.id.btn_nav_m :
-            changedFragments("month");
+            changedFragments("month",monthList);
+            nowPage = "month";
             drawerLayout.closeDrawer(drawerView);
             break;
 
         case R.id.btn_nav_f :
-            changedFragments("finish");
+            changedFragments("finish",finishList);
+            nowPage = "finish";
             drawerLayout.closeDrawer(drawerView);
             break;
 
 }
     }
 
-    private void changedFragments (String fragmentsName){
+    private void changedFragments (String fragmentsName,ArrayList<MainData> datalist){
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         switch(fragmentsName){
@@ -95,14 +134,14 @@ View drawerView;
             case "day":
                 dayDo = new DayDoFragment();
                 transaction.replace(R.id.frame_container, dayDo);
-                dayDo.showItemList();
+                dayDo.showItemList(datalist);
                 transaction.commit();
                 break;
 
             case"every":
                 everyDo = new EveryDoFragment();
                 transaction.replace(R.id.frame_container, everyDo);
-                everyDo.showItemList();
+                everyDo.showItemList(datalist);
                 transaction.commit();
                 break;
 
@@ -123,4 +162,5 @@ View drawerView;
 
         }
     }
+
 }

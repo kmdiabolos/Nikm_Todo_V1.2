@@ -23,6 +23,7 @@
                 android:scrollbarThumbVertical="@android:color/darker_gray"
                 android:scrollbars="vertical" />
 
+
         </LinearLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
